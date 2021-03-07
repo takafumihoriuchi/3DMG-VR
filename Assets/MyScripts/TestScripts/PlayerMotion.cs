@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PlayerMotion : MonoBehaviour
 {
-    [Tooltip("Object representing 3D model of left controller")]
-    [SerializeField] GameObject leftControllerObj = null;
+    //[Tooltip("Object representing 3D model of left controller")]
+    //[SerializeField] GameObject leftControllerObj = null;
 
-    [Tooltip("Object representing 3D model of right controller")]
-    [SerializeField] GameObject rightControllerObj = null;
+    //[Tooltip("Object representing 3D model of right controller")]
+    //[SerializeField] GameObject rightControllerObj = null;
 
     void Start()
     {
@@ -22,11 +22,12 @@ public class PlayerMotion : MonoBehaviour
 
     private void OnControllerButtonPress()
     {
-        if (OVRInput.GetDown(OVRInput.RawButton.Start)) // left menu button
-        {
-            leftControllerObj.SetActive(!leftControllerObj.activeSelf);
-            rightControllerObj.SetActive(!rightControllerObj.activeSelf);
-        }
+        //// left menu button
+        //if (OVRInput.GetDown(OVRInput.RawButton.Start))
+        //{
+        //    leftControllerObj.SetActive(!leftControllerObj.activeSelf);
+        //    rightControllerObj.SetActive(!rightControllerObj.activeSelf);
+        //}
     }
 
 }

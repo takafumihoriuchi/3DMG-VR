@@ -8,13 +8,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Hands_transparent_gray
-  m_Shader: {fileID: 4800000, guid: 5e0c88c3d888e4489929314c7c1ebf4b, type: 3}
-  m_ShaderKeywords: _EMISSION
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _EMISSION
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 3000
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -56,7 +57,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 824c12d1408a54d7fa756f82f12139a6, type: 3}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MatrixTex:
+        m_Texture: {fileID: 2800000, guid: fd6fceff10303448cb9d791a2e71d472, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -71,6 +76,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Ramp:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ToonShade:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
     - _ChromaAlphaCutoff: 0.01
@@ -79,40 +92,42 @@ Material:
     - _ChromaToleranceB: 15
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
-    - _DstBlend: 0
+    - _DstBlend: 10
     - _FadeEnd: 0.5
     - _FadeStart: 0.5
     - _Fresnel: 0
     - _GlossMapScale: 1
-    - _Glossiness: 0.5
+    - _Glossiness: 0
     - _GlossyReflections: 1
     - _Intensity: 0.5
     - _InvFade: 1
+    - _MatrixWidth: 4
     - _Metallic: 0
-    - _Mode: 0
+    - _Mode: 3
     - _OcclusionStrength: 1
+    - _Outline: 0.005
     - _OutlineWidth: 0.005
     - _Parallax: 0.02
     - _RimPower: 2.5
-    - _Shininess: 0.75
+    - _Shininess: 3
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Thickness: 0.5
     - _UVSec: 0
     - _Visible: 1
-    - _ZWrite: 1
+    - _ZWrite: 0
     - _face: 0
     - _linearToSrgb: 0
     - _premultiply: 0
     m_Colors:
-    - _Color: {r: 0.6544118, g: 0.8140972, b: 1, a: 0.478}
+    - _Color: {r: 0.47843137, g: 0.47843137, b: 0.47843137, a: 0.478}
     - _EmisColor: {r: 0.2, g: 0.2, b: 0.2, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _InnerColor: {r: 0.81960785, g: 0.81960785, b: 0.81960785, a: 1}
-    - _MyColor: {r: 0.87058824, g: 0.87058824, b: 0.87058824, a: 1}
+    - _InnerColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MyColor: {r: 1, g: 0.2216981, b: 0.2216981, a: 0.3764706}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectColor: {r: 1, g: 0, b: 0, a: 0.5019608}
-    - _RimColor: {r: 0.5, g: 0.78431374, b: 1, a: 0.5019608}
+    - _RimColor: {r: 0.5019608, g: 0.78431374, b: 1, a: 0.5019608}
     - _SpecColor: {r: 0.50735295, g: 0.50735295, b: 0.50735295, a: 1}
     - _TintColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
