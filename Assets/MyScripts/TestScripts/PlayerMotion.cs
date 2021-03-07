@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PlayerMotion : MonoBehaviour
 {
-    [Tooltip("object representing 3D model of left controller")]
+    [Tooltip("Object representing 3D model of left controller")]
     [SerializeField] GameObject leftControllerObj = null;
 
-    [Tooltip("object representing 3D model of right controller")]
+    [Tooltip("Object representing 3D model of right controller")]
     [SerializeField] GameObject rightControllerObj = null;
 
     void Start()
