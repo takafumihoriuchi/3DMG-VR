@@ -30,8 +30,8 @@ public class MirrorReflection : MonoBehaviour
 		if (!enabled || !rend || !rend.sharedMaterial || !rend.enabled)
 			return;
 
-		Camera cam = Camera.current;
-		if (!cam)
+        Camera cam = Camera.current;
+        if (!cam)
 			return;
 
 		// Safeguard from recursive reflections.        
