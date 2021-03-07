@@ -4,15 +4,29 @@ using UnityEngine;
 
 public class PlayerMotion : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [Tooltip("object representing 3D model of left controller")]
+    [SerializeField] GameObject leftControllerObj = null;
+
+    [Tooltip("object representing 3D model of right controller")]
+    [SerializeField] GameObject rightControllerObj = null;
+
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        OnControllerButtonPress();
     }
+
+    private void OnControllerButtonPress()
+    {
+        if (OVRInput.GetDown(OVRInput.RawButton.Start)) // left menu button
+        {
+            leftControllerObj.SetActive(!leftControllerObj.activeSelf);
+            rightControllerObj.SetActive(!rightControllerObj.activeSelf);
+        }
+    }
+
 }
