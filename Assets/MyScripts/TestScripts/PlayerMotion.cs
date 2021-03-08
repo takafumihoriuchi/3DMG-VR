@@ -14,7 +14,7 @@ public class PlayerMotion : MonoBehaviour
     void Start()
     {
         Controller = OVRPlayerController.GetComponent<CharacterController>();
-        moveDirection.x = 1.0f;
+        moveDirection.z = 1.0f;
     }
 
     void Update()
