@@ -4,11 +4,8 @@ using UnityEngine;
 
 public class PlayerMotion : MonoBehaviour
 {
-    //[Tooltip("Object representing 3D model of left controller")]
-    //[SerializeField] GameObject leftControllerObj = null;
-
-    //[Tooltip("Object representing 3D model of right controller")]
-    //[SerializeField] GameObject rightControllerObj = null;
+    //[Tooltip("put help-text here")]
+    //[SerializeField] GameObject someGameObject = null;
 
     void Start()
     {
@@ -17,17 +14,7 @@ public class PlayerMotion : MonoBehaviour
 
     void Update()
     {
-        OnControllerButtonPress();
-    }
-
-    private void OnControllerButtonPress()
-    {
-        //// left menu button
-        //if (OVRInput.GetDown(OVRInput.RawButton.Start))
-        //{
-        //    leftControllerObj.SetActive(!leftControllerObj.activeSelf);
-        //    rightControllerObj.SetActive(!rightControllerObj.activeSelf);
-        //}
+        
     }
 
 }
