@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,27 +14,60 @@ public class PlayerMotion : MonoBehaviour
     Vector3 moveDirection = Vector3.zero;
     Vector3 playerVelocity = Vector3.zero;
 
+    Vector3 touchVelocityL;
+    Vector3 touchVelocityR;
+    Vector3 touchAccelerationL;
+    Vector3 touchAccelerationR;
+
 
     void Start()
     {
         characterControllerComponent = OVRPlayerControllerGameObject.GetComponent<CharacterController>();
         OVRPlayerControllerComponent = OVRPlayerControllerGameObject.GetComponent<OVRPlayerController>();
 
-        //moveDirection.y = 0.2f; // todo これをコントローラーの加速度で調整する
+        touchVelocityL = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.LTouch);
+        touchVelocityR = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.RTouch);
+        touchAccelerationL = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.LTouch);
+        touchAccelerationR = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.RTouch);
+
+        characterControllerComponent.Move(moveDirection * Time.deltaTime);
     }
 
     void Update()
     {
-        characterControllerComponent.Move(moveDirection * Time.deltaTime);
-        Debug.Log(characterControllerComponent.isGrounded);
-        if (Input.GetKey(KeyCode.A))
+        moveDirection = Vector3.zero;
+
+        Debug.Log("ABS(R-touch Y-velocity): " + Math.Abs(touchVelocityL.y));
+
+        bool isWalkMotion =
+            (1.0f < Math.Abs(touchVelocityL.y) && Math.Abs(touchVelocityL.y) < 2.5f)
+            || (1.0f < Math.Abs(touchVelocityR.y) && Math.Abs(touchVelocityR.y) < 2.5f);
+
+        bool isJumpMotion =
+            2.5f < Math.Abs(touchVelocityL.y)
+            || 2.5f < Math.Abs(touchVelocityR.y);
+
+        if (isWalkMotion)
         {
-            if (characterControllerComponent.isGrounded) {
-                moveDirection.y = 1.0f;
-                characterControllerComponent.Move(moveDirection * Time.deltaTime);
-                moveDirection.y = 0.0f;
-            }
+            Debug.Log("walking");
+            moveDirection.z = 1.0f;
         }
+        if (isJumpMotion)
+        {
+            Debug.Log("jumping");
+            moveDirection.y = 1.0f;
+        }
+
+        characterControllerComponent.Move(moveDirection * Time.deltaTime);
+
+        //if (Input.GetKey(KeyCode.A))
+        //{
+        //    if (characterControllerComponent.isGrounded) {
+        //        moveDirection.y = 1.0f;
+        //        characterControllerComponent.Move(moveDirection * Time.deltaTime);
+        //        moveDirection.y = -1.0f;
+        //    }
+        //}
     }
 
 }
