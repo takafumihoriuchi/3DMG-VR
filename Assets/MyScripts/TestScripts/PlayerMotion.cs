@@ -8,50 +8,109 @@ public class PlayerMotion : MonoBehaviour
     //[Tooltip("put help-text here")]
     //[SerializeField] GameObject someGameObject = null;
 
-    [SerializeField] GameObject OVRPlayerControllerGameObject = null;
-    CharacterController characterControllerComponent;
-    OVRPlayerController OVRPlayerControllerComponent;
-    Vector3 moveDirection = Vector3.zero;
-    Vector3 playerVelocity = Vector3.zero;
+    [SerializeField] private GameObject OVRPlayerControllerGameObject = null;
+    private OVRPlayerController OVRPlayerControllerComponent;
 
-    Vector3 touchVelocityL;
-    Vector3 touchVelocityR;
-    Vector3 touchAccelerationL;
-    Vector3 touchAccelerationR;
+    // identical to fields of OVRPlayerController class
+    private CharacterController Controller;
+    private Vector3 MoveThrottle = Vector3.zero;
+    private float MoveScale = 1.0f;
+    private float MoveScaleMultiplier = 1.0f;
+    private float SimulationRate = 60f;
+    // todo 90fpsに変えられないか (adjust the value of SimulationRate?)
+    private float Acceleration;
+
+    private Vector3 moveDirection = Vector3.zero;
+    private Vector3 playerVelocity = Vector3.zero;
+
+    private Vector3 touchVelocityL;
+    private Vector3 touchVelocityR;
+    private Vector3 touchAccelerationL;
+    private Vector3 touchAccelerationR;
+
+    const float MIN_WALKSPEED = 1.0f;
+    const float MAX_WALKSPEED = 2.5f;
 
 
-    void Start()
+    private void Awake()
     {
-        characterControllerComponent = OVRPlayerControllerGameObject.GetComponent<CharacterController>();
-        OVRPlayerControllerComponent = OVRPlayerControllerGameObject.GetComponent<OVRPlayerController>();
-
-        characterControllerComponent.Move(moveDirection * Time.deltaTime);
+        Controller = OVRPlayerControllerGameObject.GetComponent<CharacterController>();
+        OVRPlayerControllerComponent = Controller.GetComponent<OVRPlayerController>();
     }
 
-    void Update()
+    private void Start()
     {
-        moveDirection = Vector3.zero;
+        Acceleration = OVRPlayerControllerComponent.Acceleration;
 
+        Controller.Move(moveDirection * Time.deltaTime);
+    }
+
+    private void UpdateHandShakeController()
+    {
         touchVelocityL = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.LTouch);
         touchVelocityR = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.RTouch);
         touchAccelerationL = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.LTouch);
         touchAccelerationR = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.RTouch);
+        UpdateHandShakeMovement();
+    }
+
+    private void UpdateHandShakeMovement()
+    {
+
+        bool moveForward = DetectHandShakeWalk();
+
+        if (Controller.isGrounded)
+            MoveScale = 0.0f;
+        else
+            MoveScale = 1.0f;
+
+        MoveScale += SimulationRate * Time.deltaTime;
+
+        float moveInfluence = Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
+
+        // TODO 次はここの理解から
+        Quaternion ort = OVRPlayerControllerGameObject.transform.rotation;
+        Vector3 ortEuler = ort.eulerAngles;
+        ortEuler.z = ortEuler.x = 0f;
+        ort = Quaternion.Euler(ortEuler);
+
+
+    }
+
+    private bool DetectHandShakeWalk()
+    {
+        // adjust move amount based on shaking speed
+        float handShakeSpeed = Math.Max(touchVelocityL.y, touchVelocityR.y);
+        MoveScaleMultiplier = handShakeSpeed;
+        if (handShakeSpeed > MIN_WALKSPEED && handShakeSpeed < MAX_WALKSPEED)
+            return true;
+        else
+            return false;
+    }
+
+    private void Update()
+    {
+        moveDirection = Vector3.zero;
 
         //Debug.Log("R-touch Y-velocity: " + touchVelocityR.y);
         //Debug.Log("ABS(R-touch Y-velocity): " + Math.Abs(touchVelocityR.y));
 
         bool isWalkMotion =
-            (1.0f < Math.Abs(touchVelocityL.y) && Math.Abs(touchVelocityL.y) < 2.5f)
-            || (1.0f < Math.Abs(touchVelocityR.y) && Math.Abs(touchVelocityR.y) < 2.5f);
+            (touchVelocityL.y > 1.0f && touchVelocityL.y < 2.5f)
+            || (touchVelocityR.y > 1.0f && touchVelocityR.y < 2.5f);
 
         bool isJumpMotion =
-            2.5f < touchVelocityL.y || 2.5f < touchVelocityR.y;
+            touchVelocityL.y > 2.5f || touchVelocityR.y > 2.5f;
 
-        // todo 現状のコードではデフォルトのz軸方向に進んでしまう。forward方向に進んで欲しい。
-        if (isWalkMotion)
+        Quaternion ort = OVRPlayerControllerGameObject.transform.rotation;
+        Vector3 ortEuler = ort.eulerAngles;
+        ortEuler.z = ortEuler.x = 0f;
+        ort = Quaternion.Euler(ortEuler);
+
+        if (isWalkMotion) // Input.GetKey(KeyCode.A)
         {
             Debug.Log("walking");
-            moveDirection.z = 1.0f;
+            moveDirection += ort * (OVRPlayerControllerGameObject.transform.lossyScale.z * Vector3.forward);
         }
 
         // todo 現状のコードではジャンプできていない。
@@ -61,16 +120,7 @@ public class PlayerMotion : MonoBehaviour
             moveDirection.y = 1.0f;
         }
 
-        characterControllerComponent.Move(moveDirection * Time.deltaTime);
-
-        //if (Input.GetKey(KeyCode.A))
-        //{
-        //    if (characterControllerComponent.isGrounded) {
-        //        moveDirection.y = 1.0f;
-        //        characterControllerComponent.Move(moveDirection * Time.deltaTime);
-        //        moveDirection.y = -1.0f;
-        //    }
-        //}
+        Controller.Move(moveDirection * SimulationRate * Time.deltaTime);
     }
 
 }
