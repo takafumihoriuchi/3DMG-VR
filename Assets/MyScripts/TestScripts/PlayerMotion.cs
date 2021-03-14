@@ -9,6 +9,8 @@ public class PlayerMotion : MonoBehaviour
     //[SerializeField] GameObject someGameObject = null;
 
     [SerializeField] private GameObject OVRPlayerControllerGameObject = null;
+    [SerializeField] private Transform LeftHandAnchorTransform = null;
+    [SerializeField] private Transform RightHandAnchorTransform = null;
     private OVRPlayerController OVRPlayerControllerComponent;
 
     // identical to fields of OVRPlayerController class
@@ -93,7 +95,7 @@ public class PlayerMotion : MonoBehaviour
 
         moveDirection.y += FallSpeed * SimulationRate * Time.deltaTime;
 
-        if (Controller.isGrounded && MoveThrottle.y <= transform.lossyScale.y * 0.001f)
+        if (Controller.isGrounded && MoveThrottle.y <= OVRPlayerControllerGameObject.transform.lossyScale.y * 0.001f)
         {
             // Offset correction for uneven ground
             float bumpUpOffset
@@ -126,9 +128,20 @@ public class PlayerMotion : MonoBehaviour
             = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.LTouch);
         touchAccelerationR
             = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.RTouch);
-        handShakeSpeed = Math.Max(
-            Math.Abs(GetMaxElementVector3(touchVelocityL)),
-            Math.Abs(GetMaxElementVector3(touchVelocityR)));
+
+        Transform activeHand;
+        float vel_l = Math.Abs(touchVelocityL.z);
+        float vel_r = Math.Abs(touchVelocityR.z);
+        if (vel_l > vel_r)
+        {
+            activeHand = LeftHandAnchorTransform;
+            handShakeSpeed = vel_l;
+        }
+        else
+        {
+            activeHand = RightHandAnchorTransform;
+            handShakeSpeed = vel_r;
+        }
 
         bool moveForward = DetectHandShakeWalk();
 
@@ -142,7 +155,7 @@ public class PlayerMotion : MonoBehaviour
         float moveInfluence
             = Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
 
-        Quaternion ort = OVRPlayerControllerGameObject.transform.rotation;
+        Quaternion ort = activeHand.rotation;
         Vector3 ortEuler = ort.eulerAngles;
         ortEuler.z = ortEuler.x = 0f;
         ort = Quaternion.Euler(ortEuler);

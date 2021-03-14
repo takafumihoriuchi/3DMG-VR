@@ -52537,7 +52537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 414912, guid: e6ba3498ffa1e534b91a07264266e6b8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 414912, guid: e6ba3498ffa1e534b91a07264266e6b8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -59443,7 +59443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 488160, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11479374, guid: d9809c5e8418bb047bf2c8ba1d1a2cec, type: 3}
       propertyPath: m_controller
@@ -102551,6 +102551,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   OVRPlayerControllerGameObject: {fileID: 1653310602}
+  LeftHandAnchorTransform: {fileID: 696642805}
+  RightHandAnchorTransform: {fileID: 1548265665}
 --- !u!1 &2055589234
 GameObject:
   m_ObjectHideFlags: 0
