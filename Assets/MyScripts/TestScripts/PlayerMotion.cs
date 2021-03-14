@@ -179,9 +179,9 @@ public class PlayerMotion : MonoBehaviour
         {
             //MoveThrottle += new Vector3(0, transform.lossyScale.y * JumpForce, 0);
             Vector3 tmpVec3 = handShakeVelocity;
-            tmpVec3.x *= -1;
+            tmpVec3.x *= -0.5f;
             tmpVec3.y = handShakeVelocity.y * JumpForce + 1.0f;
-            tmpVec3.z *= -1;
+            tmpVec3.z *= -0.5f;
             // todo これで良いか要確認
             MoveThrottle += tmpVec3;
         }
