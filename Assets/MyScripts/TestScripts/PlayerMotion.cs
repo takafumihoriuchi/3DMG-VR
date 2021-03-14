@@ -29,11 +29,11 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 touchVelocityR;
     private Vector3 touchAccelerationL;
     private Vector3 touchAccelerationR;
-    private float handShakeSpeed;
+    private Vector3 handShakeVelocity;
 
-    const float MIN_WALKSPEED = 0.50f;
-    const float MAX_WALKSPEED = 1.00f;
-    const float MIN_JUMPSPEED = 1.75f;
+    const float MIN_WALKSPEED = 0.5f;
+    const float MAX_WALKSPEED = 1.2f;
+    const float MIN_JUMPSPEED = 1.9f;
 
 
     private void Awake()
@@ -133,17 +133,17 @@ public class PlayerMotion : MonoBehaviour
         if (Math.Abs(touchVelocityL.y) > Math.Abs(touchVelocityR.y))
         {
             activeHand = LeftHandAnchorTransform;
-            handShakeSpeed = Math.Abs(touchVelocityL.y);
+            handShakeVelocity = touchVelocityL;
         }
         else
         {
             activeHand = RightHandAnchorTransform;
-            handShakeSpeed = Math.Abs(touchVelocityR.y);
+            handShakeVelocity = touchVelocityR;
         }
 
-        bool isWalk = DetectHandShakeWalk();
-        bool isRun = DetectHandShakeRun();
-        bool isJump = DetectHandShakeJump();
+        bool isWalk = DetectHandShakeWalk(Math.Abs(handShakeVelocity.y));
+        bool isRun = DetectHandShakeRun(Math.Abs(handShakeVelocity.y));
+        bool isJump = DetectHandShakeJump(handShakeVelocity.y);
 
         if (!IsGrounded())
             MoveScale = 0.0f;
@@ -160,50 +160,61 @@ public class PlayerMotion : MonoBehaviour
         ortEuler.z = ortEuler.x = 0f;
         ort = Quaternion.Euler(ortEuler);
 
-        if (isJump)
-        {
-            MoveThrottle += new Vector3(0, transform.lossyScale.y * JumpForce, 0);
-        }
-        else if (isRun)
+        if (isRun)
         {
             MoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
                 * moveInfluence * Vector3.forward)
-                * 1.5f; //* (1.0f + handShakeSpeed);
+                * 1.2f;
         }
         else if (isWalk)
         {
             MoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
                 * moveInfluence * Vector3.forward)
-                * 1.0f; //* (1.0f + handShakeSpeed);
+                * 1.0f;
+        }
+
+        if (isJump)
+        {
+            //MoveThrottle += new Vector3(0, transform.lossyScale.y * JumpForce, 0);
+            Vector3 tmpVec3 = handShakeVelocity;
+            tmpVec3.x *= -1;
+            tmpVec3.y = handShakeVelocity.y * JumpForce + 1.0f;
+            tmpVec3.z *= -1;
+            // todo これで良いか要確認
+            MoveThrottle += tmpVec3;
         }
 
     }
 
 
-    private bool DetectHandShakeWalk()
-    {
-        if (handShakeSpeed > MIN_WALKSPEED && handShakeSpeed < MAX_WALKSPEED)
-            return true;
-        else
-            return false;
-    }
-
-    private bool DetectHandShakeRun()
-    {
-        if (handShakeSpeed > MAX_WALKSPEED && handShakeSpeed < MIN_JUMPSPEED)
-            return true;
-        else
-            return false;
-    }
-
-
-    private bool DetectHandShakeJump()
+    private bool DetectHandShakeWalk(float speed)
     {
         if (!IsGrounded())
             return false;
-        if (handShakeSpeed > MIN_JUMPSPEED)
+        if (speed > MIN_WALKSPEED && speed < MAX_WALKSPEED)
+            return true;
+        else
+            return false;
+    }
+
+    private bool DetectHandShakeRun(float speed)
+    {
+        if (!IsGrounded())
+            return false;
+        if (speed > MAX_WALKSPEED && speed < MIN_JUMPSPEED)
+            return true;
+        else
+            return false;
+    }
+
+
+    private bool DetectHandShakeJump(float speed)
+    {
+        if (!IsGrounded())
+            return false;
+        if (speed > MIN_JUMPSPEED) // only in positive direction
             return true;
         return false;
     }
