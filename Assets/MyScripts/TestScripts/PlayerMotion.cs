@@ -31,9 +31,9 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 touchAccelerationR;
     private float handShakeSpeed;
 
-    const float MIN_WALKSPEED = 0.3f;
-    const float MAX_WALKSPEED = 0.6f;
-    const float MIN_JUMPSPEED = 1.2f;
+    const float MIN_WALKSPEED = 0.50f;
+    const float MAX_WALKSPEED = 1.00f;
+    const float MIN_JUMPSPEED = 1.75f;
 
 
     private void Awake()
@@ -201,10 +201,11 @@ public class PlayerMotion : MonoBehaviour
 
     private bool DetectHandShakeJump()
     {
+        if (!IsGrounded())
+            return false;
         if (handShakeSpeed > MIN_JUMPSPEED)
             return true;
-        else
-            return false;
+        return false;
     }
 
 
