@@ -28,8 +28,8 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 touchAccelerationR;
     private float handShakeSpeed;
 
-    const float MIN_WALKSPEED = 1.0f;
-    const float MAX_WALKSPEED = 2.5f;
+    const float MIN_WALKSPEED = 0.5f;
+    const float MAX_WALKSPEED = 1.5f;
 
 
     private void Awake()
@@ -40,70 +40,40 @@ public class PlayerMotion : MonoBehaviour
             = Controller.GetComponent<OVRPlayerController>();
     }
 
+
     private void Start()
     {
         Acceleration = OVRPlayerControllerComponent.Acceleration;
         Damping = OVRPlayerControllerComponent.Damping;
         GravityModifier = OVRPlayerControllerComponent.GravityModifier;
+
+        // disable default button input
+        OVRPlayerControllerComponent.EnableLinearMovement = false;
+
         Controller.Move(Vector3.zero * Time.deltaTime);
+
+        //OVRPlayerControllerComponent.PreCharacterMove += CharacterMoveByHandShake();
     }
 
-    private void UpdateHandShakeController()
-    {
-        touchVelocityL
-            = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.LTouch);
-        touchVelocityR
-            = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.RTouch);
-        touchAccelerationL
-            = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.LTouch);
-        touchAccelerationR
-            = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.RTouch);
-        handShakeSpeed = Math.Max(
-            Math.Abs(GetMaxElementVector3(touchVelocityL)),
-            Math.Abs(GetMaxElementVector3(touchVelocityR)));
-        UpdateHandShakeMovement();
-    }
-
-    private void UpdateHandShakeMovement()
-    {
-        bool moveForward = DetectHandShakeWalk();
-
-        if (Controller.isGrounded)
-            MoveScale = 0.0f;
-        else
-            MoveScale = 1.0f;
-
-        MoveScale += SimulationRate * Time.deltaTime;
-
-        float moveInfluence
-            = Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
-
-        Quaternion ort = OVRPlayerControllerGameObject.transform.rotation;
-        Vector3 ortEuler = ort.eulerAngles;
-        ortEuler.z = ortEuler.x = 0f;
-        ort = Quaternion.Euler(ortEuler);
-
-        if (moveForward)
-            MoveThrottle += ort
-                * (OVRPlayerControllerGameObject.transform.lossyScale.z
-                * moveInfluence * Vector3.forward)
-                * (1.0f + handShakeSpeed);
-    }
-
-    private bool DetectHandShakeWalk()
-    {
-        if (handShakeSpeed > MIN_WALKSPEED && handShakeSpeed < MAX_WALKSPEED)
-            return true;
-        else
-            return false;
-    }
 
     private void Update()
     {
         UpdateHandShakeController();
+
         Debug.Log("L-touch velocity: " + touchVelocityL);
         Debug.Log("R-touch velocity: " + touchVelocityR);
 
+        PartialUpdateController();
+    }
+
+    private void CharacterMoveByHandShake()
+    {
+        return;
+    }
+
+
+    private void PartialUpdateController()
+    {
         Vector3 moveDirection = Vector3.zero;
 
         float motorDamp = 1.0f + (Damping * SimulationRate * Time.deltaTime);
@@ -143,41 +113,70 @@ public class PlayerMotion : MonoBehaviour
 
         if (predictedXZ != actualXZ)
             MoveThrottle += (actualXZ - predictedXZ) / (SimulationRate * Time.deltaTime);
-
-        //Debug.Log("R-touch Y-velocity: " + touchVelocityR.y);
-        //Debug.Log("ABS(R-touch Y-velocity): " + Math.Abs(touchVelocityR.y));
-
-        //bool isWalkMotion =
-        //    (touchVelocityL.y > 1.0f && touchVelocityL.y < 2.5f)
-        //    || (touchVelocityR.y > 1.0f && touchVelocityR.y < 2.5f);
-
-        //bool isJumpMotion =
-        //    touchVelocityL.y > 2.5f || touchVelocityR.y > 2.5f;
-
-        //Quaternion ort = OVRPlayerControllerGameObject.transform.rotation;
-        //Vector3 ortEuler = ort.eulerAngles;
-        //ortEuler.z = ortEuler.x = 0f;
-        //ort = Quaternion.Euler(ortEuler);
-
-        //if (isWalkMotion) // Input.GetKey(KeyCode.A)
-        //{
-        //    Debug.Log("walking");
-        //    moveDirection += ort * (OVRPlayerControllerGameObject.transform.lossyScale.z * Vector3.forward);
-        //}
-
-        //// todo 現状のコードではジャンプできていない。
-        //if (isJumpMotion)
-        //{
-        //    Debug.Log("jumping");
-        //    moveDirection.y = 1.0f;
-        //}
-
-        //Controller.Move(moveDirection * SimulationRate * Time.deltaTime);
     }
+
+
+    private void UpdateHandShakeController()
+    {
+        touchVelocityL
+            = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.LTouch);
+        touchVelocityR
+            = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.RTouch);
+        touchAccelerationL
+            = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.LTouch);
+        touchAccelerationR
+            = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.RTouch);
+        handShakeSpeed = Math.Max(
+            Math.Abs(GetMaxElementVector3(touchVelocityL)),
+            Math.Abs(GetMaxElementVector3(touchVelocityR)));
+
+        bool moveForward = DetectHandShakeWalk();
+
+        if (!IsGrounded())
+            MoveScale = 0.0f;
+        else
+            MoveScale = 1.0f;
+
+        MoveScale *= SimulationRate * Time.deltaTime;
+
+        float moveInfluence
+            = Acceleration * 0.1f * MoveScale * MoveScaleMultiplier;
+
+        Quaternion ort = OVRPlayerControllerGameObject.transform.rotation;
+        Vector3 ortEuler = ort.eulerAngles;
+        ortEuler.z = ortEuler.x = 0f;
+        ort = Quaternion.Euler(ortEuler);
+
+        if (moveForward)
+            MoveThrottle += ort
+                * (OVRPlayerControllerGameObject.transform.lossyScale.z
+                * moveInfluence * Vector3.forward)
+                * (1.0f + handShakeSpeed);
+    }
+
+
+    private bool DetectHandShakeWalk()
+    {
+        if (handShakeSpeed > MIN_WALKSPEED && handShakeSpeed < MAX_WALKSPEED)
+            return true;
+        else
+            return false;
+    }
+
 
     private float GetMaxElementVector3(Vector3 vec)
     {
         return Math.Max(Math.Max(vec.x, vec.y), vec.z);
+    }
+
+    private bool IsGrounded()
+    {
+        if (Controller.isGrounded) return true;
+
+        var pos = OVRPlayerControllerGameObject.transform.position;
+        var ray = new Ray(pos + Vector3.up * 0.1f, Vector3.down);
+        var tolerance = 0.3f;
+        return Physics.Raycast(ray, tolerance);
     }
 
 }

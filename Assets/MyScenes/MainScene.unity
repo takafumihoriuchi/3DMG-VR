@@ -69210,7 +69210,7 @@ PrefabInstance:
     - target: {fileID: -927199367670048503, guid: 035a8130f4329504aaa80f75dc72628d,
         type: 3}
       propertyPath: m_Name
-      value: humpback_whale_model_baked_animation
+      value: whale
       objectReference: {fileID: 0}
     - target: {fileID: -96216609086997662, guid: 035a8130f4329504aaa80f75dc72628d,
         type: 3}
