@@ -18,11 +18,12 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 MoveThrottle = Vector3.zero;
     private float MoveScale = 1.0f;
     private float MoveScaleMultiplier = 1.0f;
-    private float SimulationRate = 60f; // todo make it 90fps (adjust the value of SimulationRate?)
+    private float SimulationRate = 60f;
     private float FallSpeed = 0.0f;
     private float Acceleration;
     private float Damping;
     private float GravityModifier;
+    private float JumpForce;
 
     private Vector3 touchVelocityL;
     private Vector3 touchVelocityR;
@@ -30,8 +31,9 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 touchAccelerationR;
     private float handShakeSpeed;
 
-    const float MIN_WALKSPEED = 0.5f;
-    const float MAX_WALKSPEED = 1.5f;
+    const float MIN_WALKSPEED = 0.3f;
+    const float MAX_WALKSPEED = 0.6f;
+    const float MIN_JUMPSPEED = 1.2f;
 
 
     private void Awake()
@@ -48,33 +50,32 @@ public class PlayerMotion : MonoBehaviour
         Acceleration = OVRPlayerControllerComponent.Acceleration;
         Damping = OVRPlayerControllerComponent.Damping;
         GravityModifier = OVRPlayerControllerComponent.GravityModifier;
+        JumpForce = OVRPlayerControllerComponent.JumpForce;
 
-        // disable default button input
         OVRPlayerControllerComponent.EnableLinearMovement = false;
-
+        OVRPlayerControllerComponent.PreCharacterMove
+            += () => CharacterMoveByHandShake();
         Controller.Move(Vector3.zero * Time.deltaTime);
-
-        //OVRPlayerControllerComponent.PreCharacterMove += CharacterMoveByHandShake();
     }
 
 
-    private void Update()
+    private void Update() { }
+
+
+    private void CharacterMoveByHandShake()
     {
-        UpdateHandShakeController();
+        Debug.Log("This is inside CharacterMoveByHandShake()");
+
+        HandShakeControl();
 
         Debug.Log("L-touch velocity: " + touchVelocityL);
         Debug.Log("R-touch velocity: " + touchVelocityR);
 
-        PartialUpdateController();
-    }
-
-    private void CharacterMoveByHandShake()
-    {
-        return;
+        UpdateControllerExtra();
     }
 
 
-    private void PartialUpdateController()
+    private void UpdateControllerExtra()
     {
         Vector3 moveDirection = Vector3.zero;
 
@@ -105,8 +106,6 @@ public class PlayerMotion : MonoBehaviour
             moveDirection -= bumpUpOffset * Vector3.up;
         }
 
-        // todo PreCharacterMove()を使用することで全て代替可能か
-
         Vector3 predictedXZ = Vector3.Scale((Controller.transform.localPosition + moveDirection), new Vector3(1, 0, 1));
 
         Controller.Move(moveDirection);
@@ -118,7 +117,7 @@ public class PlayerMotion : MonoBehaviour
     }
 
 
-    private void UpdateHandShakeController()
+    private void HandShakeControl()
     {
         touchVelocityL
             = OVRInput.GetLocalControllerVelocity(OVRInput.Controller.LTouch);
@@ -130,20 +129,21 @@ public class PlayerMotion : MonoBehaviour
             = OVRInput.GetLocalControllerAcceleration(OVRInput.Controller.RTouch);
 
         Transform activeHand;
-        float vel_l = Math.Abs(touchVelocityL.z);
-        float vel_r = Math.Abs(touchVelocityR.z);
-        if (vel_l > vel_r)
+
+        if (Math.Abs(touchVelocityL.y) > Math.Abs(touchVelocityR.y))
         {
             activeHand = LeftHandAnchorTransform;
-            handShakeSpeed = vel_l;
+            handShakeSpeed = Math.Abs(touchVelocityL.y);
         }
         else
         {
             activeHand = RightHandAnchorTransform;
-            handShakeSpeed = vel_r;
+            handShakeSpeed = Math.Abs(touchVelocityR.y);
         }
 
-        bool moveForward = DetectHandShakeWalk();
+        bool isWalk = DetectHandShakeWalk();
+        bool isRun = DetectHandShakeRun();
+        bool isJump = DetectHandShakeJump();
 
         if (!IsGrounded())
             MoveScale = 0.0f;
@@ -160,17 +160,48 @@ public class PlayerMotion : MonoBehaviour
         ortEuler.z = ortEuler.x = 0f;
         ort = Quaternion.Euler(ortEuler);
 
-        if (moveForward)
+        if (isJump)
+        {
+            MoveThrottle += new Vector3(0, transform.lossyScale.y * JumpForce, 0);
+        }
+        else if (isRun)
+        {
             MoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
                 * moveInfluence * Vector3.forward)
-                * (1.0f + handShakeSpeed);
+                * 1.5f; //* (1.0f + handShakeSpeed);
+        }
+        else if (isWalk)
+        {
+            MoveThrottle += ort
+                * (OVRPlayerControllerGameObject.transform.lossyScale.z
+                * moveInfluence * Vector3.forward)
+                * 1.0f; //* (1.0f + handShakeSpeed);
+        }
+
     }
 
 
     private bool DetectHandShakeWalk()
     {
         if (handShakeSpeed > MIN_WALKSPEED && handShakeSpeed < MAX_WALKSPEED)
+            return true;
+        else
+            return false;
+    }
+
+    private bool DetectHandShakeRun()
+    {
+        if (handShakeSpeed > MAX_WALKSPEED && handShakeSpeed < MIN_JUMPSPEED)
+            return true;
+        else
+            return false;
+    }
+
+
+    private bool DetectHandShakeJump()
+    {
+        if (handShakeSpeed > MIN_JUMPSPEED)
             return true;
         else
             return false;
