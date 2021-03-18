@@ -30,9 +30,9 @@ public class PlayerMotion : MonoBehaviour
     private bool motionInertia = false;
     private float motionInertiaDuration = 1.0f;
 
-    const float WALK_THRESHOLD = 0.5f;
-    const float RUN_THRESHOLD = 1.2f;
-    const float JUMP_THRESHOLD = 2.0f;
+    const float WALK_THRESHOLD = 0.8f;
+    const float RUN_THRESHOLD = 1.3f;
+    const float JUMP_THRESHOLD = 1.5f;
 
 
     private void Awake()
@@ -133,14 +133,14 @@ public class PlayerMotion : MonoBehaviour
                 SetMotionInertia();
             tmpMoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
-                * moveInfluence * Vector3.forward) * 0.25f;
+                * moveInfluence * Vector3.forward) * 0.2f;
 
             bool isRun = DetectHandShakeRun(Math.Abs(handShakeVel.y));
             if (isRun)
                 tmpMoveThrottle *= 2.0f;
         }
 
-        bool isJump = DetectHandShakeJump(handShakeVel.y);
+        bool isJump = DetectHandShakeJump();
         if (isJump)
             tmpMoveThrottle += new Vector3(0.0f, JumpForce, 0.0f);
 
@@ -172,10 +172,12 @@ public class PlayerMotion : MonoBehaviour
     }
 
 
-    private bool DetectHandShakeJump(float speed)
+    private bool DetectHandShakeJump()
     {
-        if (!IsGrounded()) return false;
-        if (speed > JUMP_THRESHOLD) return true;
+        if (!IsGrounded())
+            return false;
+        if (touchVelocityL.y > JUMP_THRESHOLD && touchVelocityR.y > JUMP_THRESHOLD)
+            return true;
         return false;
     }
 
