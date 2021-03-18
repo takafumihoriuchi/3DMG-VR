@@ -28,11 +28,11 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 touchAccelerationL;
     private Vector3 touchAccelerationR;
     private bool motionInertia = false;
-    private float motionInertiaDuration = 0.5f;
+    private float motionInertiaDuration = 1.0f;
 
-    const float MIN_WALKSPEED = 0.5f;
-    const float MAX_WALKSPEED = 1.2f;
-    const float MIN_JUMPSPEED = 1.9f;
+    const float WALKTHRESHOLD_LOW = 0.5f;
+    const float WALKTHRESHOLD_HIGH = 1.2f;
+    const float JUMPTHRESHOLD_LOW = 2.0f;
 
 
     private void Awake()
@@ -134,16 +134,17 @@ public class PlayerMotion : MonoBehaviour
             tmpMoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
                 * moveInfluence * Vector3.forward);
-            if (isWalk) tmpMoveThrottle *= 0.8f;
-            else if (isRun) tmpMoveThrottle *= 1.2f;
+            if (isWalk) tmpMoveThrottle *= 0.25f;
+            else if (isRun) tmpMoveThrottle *= 0.50f;
         }
 
         bool isJump = DetectHandShakeJump(handShakeVel.y);
         if (isJump)
         {
-            Vector3 tmpVec3 = handShakeVel;
-            tmpVec3.y *= (JumpForce / 10.0f) + 0.5f;
-            tmpMoveThrottle += tmpVec3;
+            //Vector3 tmpVec3 = handShakeVel;
+            //tmpVec3.y *= (JumpForce / 10.0f) + 0.5f;
+            //tmpMoveThrottle += tmpVec3;
+            tmpMoveThrottle += new Vector3(0.0f, JumpForce, 0.0f);
         }
 
         return tmpMoveThrottle;
@@ -162,7 +163,7 @@ public class PlayerMotion : MonoBehaviour
     {
         if (!IsGrounded())
             return false;
-        if (speed > MIN_WALKSPEED && speed < MAX_WALKSPEED)
+        if (speed > WALKTHRESHOLD_LOW && speed < WALKTHRESHOLD_HIGH)
             return true;
         else
             return false;
@@ -173,7 +174,7 @@ public class PlayerMotion : MonoBehaviour
     {
         if (!IsGrounded())
             return false;
-        if (speed > MAX_WALKSPEED && speed < MIN_JUMPSPEED)
+        if (speed > WALKTHRESHOLD_HIGH && speed < JUMPTHRESHOLD_LOW)
             return true;
         else
             return false;
@@ -184,7 +185,7 @@ public class PlayerMotion : MonoBehaviour
     {
         if (!IsGrounded())
             return false;
-        if (speed > MIN_JUMPSPEED)
+        if (speed > JUMPTHRESHOLD_LOW)
             return true;
         return false;
     }
