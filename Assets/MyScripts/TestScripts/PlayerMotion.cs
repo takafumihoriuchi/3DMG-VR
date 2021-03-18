@@ -30,9 +30,9 @@ public class PlayerMotion : MonoBehaviour
     private bool motionInertia = false;
     private float motionInertiaDuration = 1.0f;
 
-    const float WALKTHRESHOLD_LOW = 0.5f;
-    const float WALKTHRESHOLD_HIGH = 1.2f;
-    const float JUMPTHRESHOLD_LOW = 2.0f;
+    const float WALK_THRESHOLD = 0.5f;
+    const float RUN_THRESHOLD = 1.2f;
+    const float JUMP_THRESHOLD = 2.0f;
 
 
     private void Awake()
@@ -127,25 +127,22 @@ public class PlayerMotion : MonoBehaviour
         Vector3 tmpMoveThrottle = Vector3.zero;
 
         bool isWalk = DetectHandShakeWalk(Math.Abs(handShakeVel.y)) || motionInertia;
-        bool isRun = DetectHandShakeRun(Math.Abs(handShakeVel.y)) || motionInertia;
-        if (isWalk || isRun)
+        if (isWalk)
         {
-            if (!motionInertia) SetMotionInertia();
+            if (!motionInertia)
+                SetMotionInertia();
             tmpMoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
-                * moveInfluence * Vector3.forward);
-            if (isWalk) tmpMoveThrottle *= 0.25f;
-            else if (isRun) tmpMoveThrottle *= 0.50f;
+                * moveInfluence * Vector3.forward) * 0.25f;
+
+            bool isRun = DetectHandShakeRun(Math.Abs(handShakeVel.y));
+            if (isRun)
+                tmpMoveThrottle *= 2.0f;
         }
 
         bool isJump = DetectHandShakeJump(handShakeVel.y);
         if (isJump)
-        {
-            //Vector3 tmpVec3 = handShakeVel;
-            //tmpVec3.y *= (JumpForce / 10.0f) + 0.5f;
-            //tmpMoveThrottle += tmpVec3;
             tmpMoveThrottle += new Vector3(0.0f, JumpForce, 0.0f);
-        }
 
         return tmpMoveThrottle;
     }
@@ -161,32 +158,24 @@ public class PlayerMotion : MonoBehaviour
 
     private bool DetectHandShakeWalk(float speed)
     {
-        if (!IsGrounded())
-            return false;
-        if (speed > WALKTHRESHOLD_LOW && speed < WALKTHRESHOLD_HIGH)
-            return true;
-        else
-            return false;
+        if (!IsGrounded()) return false;
+        if (speed > WALK_THRESHOLD) return true;
+        return false;
     }
 
 
     private bool DetectHandShakeRun(float speed)
     {
-        if (!IsGrounded())
-            return false;
-        if (speed > WALKTHRESHOLD_HIGH && speed < JUMPTHRESHOLD_LOW)
-            return true;
-        else
-            return false;
+        if (!IsGrounded()) return false;
+        if (speed > RUN_THRESHOLD) return true;
+        return false;
     }
 
 
     private bool DetectHandShakeJump(float speed)
     {
-        if (!IsGrounded())
-            return false;
-        if (speed > JUMPTHRESHOLD_LOW)
-            return true;
+        if (!IsGrounded()) return false;
+        if (speed > JUMP_THRESHOLD) return true;
         return false;
     }
 
