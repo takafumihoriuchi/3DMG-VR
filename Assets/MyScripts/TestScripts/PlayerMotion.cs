@@ -27,6 +27,8 @@ public class PlayerMotion : MonoBehaviour
     private Vector3 touchVelocityR;
     private Vector3 touchAccelerationL;
     private Vector3 touchAccelerationR;
+    private bool motionInertia = false;
+    private float motionInertiaDuration = 0.5f;
 
     const float MIN_WALKSPEED = 0.5f;
     const float MAX_WALKSPEED = 1.2f;
@@ -124,35 +126,35 @@ public class PlayerMotion : MonoBehaviour
     {
         Vector3 tmpMoveThrottle = Vector3.zero;
 
-        bool isWalk = DetectHandShakeWalk(Math.Abs(handShakeVel.y));
-        bool isRun = DetectHandShakeRun(Math.Abs(handShakeVel.y));
+        bool isWalk = DetectHandShakeWalk(Math.Abs(handShakeVel.y)) || motionInertia;
+        bool isRun = DetectHandShakeRun(Math.Abs(handShakeVel.y)) || motionInertia;
+        if (isWalk || isRun)
+        {
+            if (!motionInertia) SetMotionInertia();
+            tmpMoveThrottle += ort
+                * (OVRPlayerControllerGameObject.transform.lossyScale.z
+                * moveInfluence * Vector3.forward);
+            if (isWalk) tmpMoveThrottle *= 0.8f;
+            else if (isRun) tmpMoveThrottle *= 1.2f;
+        }
+
         bool isJump = DetectHandShakeJump(handShakeVel.y);
-
-        if (isRun)
-        {
-            tmpMoveThrottle += ort
-                * (OVRPlayerControllerGameObject.transform.lossyScale.z
-                * moveInfluence * Vector3.forward)
-                * 1.2f;
-        }
-        else if (isWalk)
-        {
-            tmpMoveThrottle += ort
-                * (OVRPlayerControllerGameObject.transform.lossyScale.z
-                * moveInfluence * Vector3.forward)
-                * 1.0f;
-        }
-
         if (isJump)
         {
             Vector3 tmpVec3 = handShakeVel;
-            tmpVec3.x *= -0.5f;
-            tmpVec3.y = handShakeVel.y * JumpForce + 1.0f;
-            tmpVec3.z *= -0.5f;
-            tmpMoveThrottle += tmpVec3; // todo これで良いか要確認
+            tmpVec3.y *= (JumpForce / 10.0f) + 0.5f;
+            tmpMoveThrottle += tmpVec3;
         }
 
         return tmpMoveThrottle;
+    }
+
+
+    IEnumerator SetMotionInertia()
+    {
+        motionInertia = true;
+        yield return new WaitForSecondsRealtime(motionInertiaDuration);
+        motionInertia = false;
     }
 
 
@@ -182,7 +184,7 @@ public class PlayerMotion : MonoBehaviour
     {
         if (!IsGrounded())
             return false;
-        if (speed > MIN_JUMPSPEED) // only in positive direction
+        if (speed > MIN_JUMPSPEED)
             return true;
         return false;
     }
