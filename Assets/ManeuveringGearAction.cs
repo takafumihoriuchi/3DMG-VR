@@ -5,7 +5,6 @@ using UnityEngine;
 public class ManeuveringGearAction : MonoBehaviour
 {
     [SerializeField] private GameObject bullet = null;
-
     [SerializeField] private Transform leftHandAnchor;
     [SerializeField] private Transform rightHandAnchor;
 
@@ -29,7 +28,12 @@ public class ManeuveringGearAction : MonoBehaviour
         if (bulletReadyL &&
             (OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || Input.GetKey(KeyCode.L)))
         {
-            GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, leftHandAnchor.rotation);
+            Quaternion ort = leftHandAnchor.rotation;
+            Vector3 ortEuler = ort.eulerAngles;
+            ortEuler.z = ortEuler.x = 0f;
+            ort = Quaternion.Euler(ortEuler);
+
+            GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, ort);
             Rigidbody bulletRigidBody = bulletInstance.GetComponent<Rigidbody>();
             bulletInstance.SetActive(true);
             bulletRigidBody.AddForce(transform.forward * shotSpeed);

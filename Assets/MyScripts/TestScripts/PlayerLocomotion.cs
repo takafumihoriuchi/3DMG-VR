@@ -28,7 +28,7 @@ public class PlayerLocomotion : MonoBehaviour
     private Vector3 touchAccelerationL;
     private Vector3 touchAccelerationR;
     private bool motionInertia = false;
-    private float motionInertiaDuration = 1.0f;
+    private float motionInertiaDuration = 0.25f;
 
     const float WALK_THRESHOLD = 0.8f;
     const float RUN_THRESHOLD = 1.3f;
