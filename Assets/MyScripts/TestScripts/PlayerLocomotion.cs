@@ -130,7 +130,7 @@ public class PlayerLocomotion : MonoBehaviour
         if (isWalk)
         {
             if (!motionInertia)
-                SetMotionInertia();
+                StartCoroutine(SetMotionInertia());
             tmpMoveThrottle += ort
                 * (OVRPlayerControllerGameObject.transform.lossyScale.z
                 * moveInfluence * Vector3.forward) * 0.2f;

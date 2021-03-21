@@ -2856,6 +2856,7 @@ GameObject:
   m_Component:
   - component: {fileID: 82306048}
   - component: {fileID: 82306049}
+  - component: {fileID: 82306050}
   m_Layer: 0
   m_Name: PlayerBehaviorManager
   m_TagString: Untagged
@@ -2892,6 +2893,24 @@ MonoBehaviour:
   OVRPlayerControllerGameObject: {fileID: 1653310602}
   LeftHandAnchorTransform: {fileID: 696642805}
   RightHandAnchorTransform: {fileID: 1548265665}
+--- !u!114 &82306050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82306047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 492ffd38b010847699e15d805e247497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bullet: {fileID: 652885076}
+  leftHandAnchor: {fileID: 696642805}
+  rightHandAnchor: {fileID: 1548265665}
+  shotSpeed: 2500
+  shotCount: 9999
+  shotInterval: 0.5
 --- !u!1001 &88353850
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29997,6 +30016,7 @@ GameObject:
   - component: {fileID: 652885080}
   - component: {fileID: 652885079}
   - component: {fileID: 652885078}
+  - component: {fileID: 652885081}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: Untagged
@@ -30050,7 +30070,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ab91118608a954df7a6103a9436d5e25, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -30079,6 +30099,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 652885076}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &652885081
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652885076}
+  serializedVersion: 2
+  m_Mass: 3
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &657588881
 GameObject:
   m_ObjectHideFlags: 0
