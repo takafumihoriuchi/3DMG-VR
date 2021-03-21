@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMotion : MonoBehaviour
+public class PlayerLocomotion : MonoBehaviour
 {
     [SerializeField] private GameObject OVRPlayerControllerGameObject = null;
     [SerializeField] private Transform LeftHandAnchorTransform = null;
