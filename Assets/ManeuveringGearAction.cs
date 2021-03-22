@@ -11,16 +11,18 @@ public class ManeuveringGearAction : MonoBehaviour
     [SerializeField] private AudioClip wireRewind = null;
     [SerializeField] private AudioClip gunShot = null;
 
-    [SerializeField] private float shotSpeed = 2500.0f;
+    [SerializeField] private float shotSpeed = 4000.0f;
     [SerializeField] private int shotCount = 9999;
     [SerializeField] private float shotInterval = 0.35f;
 
     private AudioSource wireReleaseAudio;
     private AudioSource wireRewindAudio;
-    private AudioSource gunShotAudio;
 
     private bool bulletReadyL = true;
     private bool bulletReadyR = true;
+    private const int LEFT = 0;
+    private const int RIGHT = 1;
+    private bool[] bulletReady = new bool[2] {true, true};
 
     void Start()
     {
@@ -28,8 +30,6 @@ public class ManeuveringGearAction : MonoBehaviour
         wireReleaseAudio.clip = wireRelease;
         wireRewindAudio = gameObject.AddComponent<AudioSource>();
         wireRewindAudio.clip = wireRewind;
-        gunShotAudio = gameObject.AddComponent<AudioSource>();
-        gunShotAudio.clip = gunShot;
 
         bullet.SetActive(false);
     }
@@ -37,38 +37,39 @@ public class ManeuveringGearAction : MonoBehaviour
     
     void Update()
     {
-        Debug.Log("bulletReadyL: " + bulletReadyL);
+        MonitorFireBullet(LEFT, leftHandAnchor,
+            OVRInput.Get(OVRInput.RawButton.LIndexTrigger), Input.GetKey(KeyCode.L));
+        MonitorFireBullet(RIGHT, rightHandAnchor,
+            OVRInput.Get(OVRInput.RawButton.RIndexTrigger), Input.GetKey(KeyCode.R));
+    }
 
-        if (bulletReadyL &&
-            (OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || Input.GetKey(KeyCode.L)))
+
+    private void MonitorFireBullet(int SIDE, Transform handAnchor, bool isTriggered, bool isKeyPressed)
+    {
+        if (bulletReady[SIDE] && (isTriggered || isKeyPressed))
         {
-            //Quaternion ort = leftHandAnchor.rotation;
-            //Vector3 ortEuler = ort.eulerAngles;
-            //ortEuler.z = ortEuler.x = 0f;
-            //ort = Quaternion.Euler(ortEuler);
-
-            //GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, ort);
-
-            GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, leftHandAnchor.rotation);
+            GameObject bulletInstance = Instantiate(bullet, handAnchor.position, handAnchor.rotation);
+            bulletInstance.SetActive(true);
 
             Rigidbody bulletRigidBody = bulletInstance.GetComponent<Rigidbody>();
-            bulletInstance.SetActive(true);
-            bulletRigidBody.AddForce(leftHandAnchor.transform.forward * shotSpeed);
+            bulletRigidBody.AddForce(handAnchor.transform.forward * shotSpeed);
+
+            AudioSource gunShotAudio = bulletInstance.AddComponent<AudioSource>();
+            gunShotAudio.clip = gunShot;
             gunShotAudio.Play();
 
             shotCount--;
-            StartCoroutine(SetBulletReloadInterval());
+            StartCoroutine(SetBulletReloadInterval(SIDE));
 
             Destroy(bulletInstance, 3.0f);
         }
-
     }
 
-    IEnumerator SetBulletReloadInterval()
+    IEnumerator SetBulletReloadInterval(int SIDE)
     {
-        bulletReadyL = false;
+        bulletReady[SIDE] = false;
         yield return new WaitForSecondsRealtime(shotInterval);
-        bulletReadyL = true;
+        bulletReady[SIDE] = true;
     }
 
 }
