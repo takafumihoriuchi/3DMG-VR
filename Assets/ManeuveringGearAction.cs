@@ -1,15 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ManeuveringGearAction : MonoBehaviour
 {
     [SerializeField] private GameObject bullet = null;
+
     [SerializeField] private Transform leftHandAnchor = null;
     [SerializeField] private Transform rightHandAnchor = null;
+
     [SerializeField] private AudioClip wireRelease = null;
     [SerializeField] private AudioClip wireRewind = null;
     [SerializeField] private AudioClip gunShot = null;
+
+    [SerializeField] private GameObject fireBulletGionCanvas = null;
 
     [SerializeField] private float shotSpeed = 4000.0f;
     [SerializeField] private int shotCount = 9999;
@@ -32,6 +37,7 @@ public class ManeuveringGearAction : MonoBehaviour
         wireRewindAudio.clip = wireRewind;
 
         bullet.SetActive(false);
+        fireBulletGionCanvas.SetActive(false);
     }
 
     
@@ -54,14 +60,25 @@ public class ManeuveringGearAction : MonoBehaviour
             Rigidbody bulletRigidBody = bulletInstance.GetComponent<Rigidbody>();
             bulletRigidBody.AddForce(handAnchor.transform.forward * shotSpeed);
 
+            // sound effect
             AudioSource gunShotAudio = bulletInstance.AddComponent<AudioSource>();
             gunShotAudio.clip = gunShot;
             gunShotAudio.Play();
+
+            // visual sound effect (gion-go)
+            System.Random rand = new System.Random();
+            Vector3 fireGionPos = handAnchor.position;
+            fireGionPos.z += 1.0f + rand.Next(-1,1)/10.0f;
+            Quaternion fireGionRot = handAnchor.rotation;
+            fireGionRot.x = fireGionRot.y = 0.0f;
+            fireGionRot.z += rand.Next(-1, 1) / 10.0f;
+            GameObject fireGionInstance = Instantiate(fireBulletGionCanvas, fireGionPos, fireGionRot);
 
             shotCount--;
             StartCoroutine(SetBulletReloadInterval(SIDE));
 
             Destroy(bulletInstance, 3.0f);
+            Destroy(fireGionInstance, 1.0f);
         }
     }
 
