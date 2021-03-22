@@ -42,15 +42,18 @@ public class ManeuveringGearAction : MonoBehaviour
         if (bulletReadyL &&
             (OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || Input.GetKey(KeyCode.L)))
         {
-            Quaternion ort = leftHandAnchor.rotation;
-            Vector3 ortEuler = ort.eulerAngles;
-            ortEuler.z = ortEuler.x = 0f;
-            ort = Quaternion.Euler(ortEuler);
+            //Quaternion ort = leftHandAnchor.rotation;
+            //Vector3 ortEuler = ort.eulerAngles;
+            //ortEuler.z = ortEuler.x = 0f;
+            //ort = Quaternion.Euler(ortEuler);
 
-            GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, ort);
+            //GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, ort);
+
+            GameObject bulletInstance = Instantiate(bullet, leftHandAnchor.position, leftHandAnchor.rotation);
+
             Rigidbody bulletRigidBody = bulletInstance.GetComponent<Rigidbody>();
             bulletInstance.SetActive(true);
-            bulletRigidBody.AddForce(transform.forward * shotSpeed);
+            bulletRigidBody.AddForce(leftHandAnchor.transform.forward * shotSpeed);
             gunShotAudio.Play();
 
             shotCount--;
