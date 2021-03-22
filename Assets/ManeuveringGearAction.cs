@@ -18,7 +18,7 @@ public class ManeuveringGearAction : MonoBehaviour
 
     [SerializeField] private float shotSpeed = 4000.0f;
     [SerializeField] private int shotCount = 9999;
-    [SerializeField] private float shotInterval = 0.35f;
+    [SerializeField] private float shotInterval = 0.25f;
 
     private AudioSource wireReleaseAudio;
     private AudioSource wireRewindAudio;
@@ -67,12 +67,15 @@ public class ManeuveringGearAction : MonoBehaviour
 
             // visual sound effect (gion-go)
             System.Random rand = new System.Random();
-            Vector3 fireGionPos = handAnchor.position;
-            fireGionPos.z += 1.0f + rand.Next(-1,1)/10.0f;
+            Vector3 fireGionPos = handAnchor.position + handAnchor.forward;
+            fireGionPos.x += rand.Next(-1, 1) / 5.0f;
+            fireGionPos.y += rand.Next(-1, 1) / 5.0f;
+            fireGionPos.z += rand.Next(-1, 1) / 5.0f;
             Quaternion fireGionRot = handAnchor.rotation;
-            fireGionRot.x = fireGionRot.y = 0.0f;
-            fireGionRot.z += rand.Next(-1, 1) / 10.0f;
+            fireGionRot.x = 0.0f;
+            fireGionRot.z += rand.Next(-1, 1) / 5.0f;
             GameObject fireGionInstance = Instantiate(fireBulletGionCanvas, fireGionPos, fireGionRot);
+            fireGionInstance.SetActive(true);
 
             shotCount--;
             StartCoroutine(SetBulletReloadInterval(SIDE));
