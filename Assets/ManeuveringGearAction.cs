@@ -5,18 +5,32 @@ using UnityEngine;
 public class ManeuveringGearAction : MonoBehaviour
 {
     [SerializeField] private GameObject bullet = null;
-    [SerializeField] private Transform leftHandAnchor;
-    [SerializeField] private Transform rightHandAnchor;
+    [SerializeField] private Transform leftHandAnchor = null;
+    [SerializeField] private Transform rightHandAnchor = null;
+    [SerializeField] private AudioClip wireRelease = null;
+    [SerializeField] private AudioClip wireRewind = null;
+    [SerializeField] private AudioClip gunShot = null;
 
     [SerializeField] private float shotSpeed = 2500.0f;
     [SerializeField] private int shotCount = 9999;
-    [SerializeField] private float shotInterval = 1.0f;
+    [SerializeField] private float shotInterval = 0.35f;
+
+    private AudioSource wireReleaseAudio;
+    private AudioSource wireRewindAudio;
+    private AudioSource gunShotAudio;
 
     private bool bulletReadyL = true;
     private bool bulletReadyR = true;
 
     void Start()
     {
+        wireReleaseAudio = gameObject.AddComponent<AudioSource>();
+        wireReleaseAudio.clip = wireRelease;
+        wireRewindAudio = gameObject.AddComponent<AudioSource>();
+        wireRewindAudio.clip = wireRewind;
+        gunShotAudio = gameObject.AddComponent<AudioSource>();
+        gunShotAudio.clip = gunShot;
+
         bullet.SetActive(false);
     }
 
@@ -37,6 +51,7 @@ public class ManeuveringGearAction : MonoBehaviour
             Rigidbody bulletRigidBody = bulletInstance.GetComponent<Rigidbody>();
             bulletInstance.SetActive(true);
             bulletRigidBody.AddForce(transform.forward * shotSpeed);
+            gunShotAudio.Play();
 
             shotCount--;
             StartCoroutine(SetBulletReloadInterval());

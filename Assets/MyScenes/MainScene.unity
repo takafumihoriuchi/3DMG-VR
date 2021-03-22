@@ -2908,6 +2908,9 @@ MonoBehaviour:
   bullet: {fileID: 652885076}
   leftHandAnchor: {fileID: 696642805}
   rightHandAnchor: {fileID: 1548265665}
+  wireRelease: {fileID: 8300000, guid: a7c183013ee6148be8a30f9ee2da8b6b, type: 3}
+  wireRewind: {fileID: 8300000, guid: 3b8cd98ccc9d54c2485de644488570b2, type: 3}
+  gunShot: {fileID: 8300000, guid: f3773aae8e05841bf85f7712927363ac, type: 3}
   shotSpeed: 2500
   shotCount: 9999
   shotInterval: 0.5
