@@ -12,8 +12,12 @@ public class PlayerWireAction : MonoBehaviour
     [SerializeField] private AudioClip wireRelease = null;
     [SerializeField] private AudioClip wireRewind = null;
 
-    [SerializeField] private LayerMask grappaleLayer;
-    [SerializeField] private float wireMaxLength = 100.0f;
+    [SerializeField] private LayerMask grappleableLayer;
+    [SerializeField] private float wireMaxLength = 999.0f;
+
+    [SerializeField] private float spring = 4.5f;
+    [SerializeField] private float damper = 7.0f;
+    [SerializeField] private float massScale = 4.5f;
 
     private const int LEFT = 0;
     private const int RIGHT = 1;
@@ -73,10 +77,11 @@ public class PlayerWireAction : MonoBehaviour
     {
         RaycastHit hit;
         if (Physics.Raycast(handAnchor[SIDE].position,
-            handAnchor[SIDE].forward, out hit, wireMaxLength, grappaleLayer))
+            handAnchor[SIDE].forward, out hit, wireMaxLength, grappleableLayer)) // todo "grappable"ではなく、除外するレイヤーでは？
         {
+            Debug.Log("hit.point: " + hit.point);
             grapplePoint[SIDE] = hit.point;
-            lineRend[SIDE] = wireInstance[SIDE].GetComponent<LineRenderer>();
+
             joint[SIDE] = playerGameObject.AddComponent<SpringJoint>();
             joint[SIDE].autoConfigureConnectedAnchor = false;
             joint[SIDE].connectedAnchor = grapplePoint[SIDE];
@@ -86,11 +91,15 @@ public class PlayerWireAction : MonoBehaviour
             joint[SIDE].maxDistance = distanceToPoint * 0.8f;
             joint[SIDE].minDistance = distanceToPoint * 0.25f;
 
-            joint[SIDE].spring = 4.5f;
-            joint[SIDE].damper = 7.0f;
-            joint[SIDE].massScale = 4.5f;
+            joint[SIDE].spring = spring;
+            joint[SIDE].damper = damper;
+            joint[SIDE].massScale = massScale;
 
             lineRend[SIDE].positionCount = 2;
+        }
+        else
+        {
+            Debug.Log("did not hit");
         }
     }
 
@@ -120,6 +129,8 @@ public class PlayerWireAction : MonoBehaviour
 
         wireRewindAudio[SIDE] = wireInstance[SIDE].AddComponent<AudioSource>();
         wireRewindAudio[SIDE].clip = wireRewind;
+
+        lineRend[SIDE] = wireInstance[SIDE].GetComponent<LineRenderer>();
     }
 
 

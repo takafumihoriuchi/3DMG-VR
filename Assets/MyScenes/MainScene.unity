@@ -2932,10 +2932,13 @@ MonoBehaviour:
   wire: {fileID: 2025275200}
   wireRelease: {fileID: 8300000, guid: a7c183013ee6148be8a30f9ee2da8b6b, type: 3}
   wireRewind: {fileID: 8300000, guid: 3b8cd98ccc9d54c2485de644488570b2, type: 3}
-  grappaleLayer:
+  grappableLayer:
     serializedVersion: 2
     m_Bits: 256
   wireMaxLength: 100
+  spring: 4.5
+  damper: 7
+  massScale: 4.5
 --- !u!1001 &88353850
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11325,8 +11328,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.75
-  m_fontSizeBase: 0.75
+  m_fontSize: 0.4
+  m_fontSizeBase: 0.4
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -79824,6 +79827,22 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1833275653}
   m_PrefabAsset: {fileID: 0}
+--- !u!54 &1653310603
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653310602}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1667714012
 GameObject:
   m_ObjectHideFlags: 0

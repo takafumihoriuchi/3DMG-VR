@@ -71,8 +71,8 @@ public class PlayerLocomotion : MonoBehaviour
         UpdateController();
 
         // display for development purpose
-        Debug.Log("L-touch velocity: " + touchVelocityL);
-        Debug.Log("R-touch velocity: " + touchVelocityR);
+        //Debug.Log("L-touch velocity: " + touchVelocityL);
+        //Debug.Log("R-touch velocity: " + touchVelocityR);
     }
 
 
