@@ -18,6 +18,8 @@ public class PlayerWireAction : MonoBehaviour
     [SerializeField] private float spring = 4.5f;
     [SerializeField] private float damper = 7.0f;
     [SerializeField] private float massScale = 4.5f;
+    [SerializeField] private float maxDistRate = 0.0f; // 0.8f
+    [SerializeField] private float minDistRate = 0.0f; // 0.25f
 
     private const int LEFT = 0;
     private const int RIGHT = 1;
@@ -88,8 +90,8 @@ public class PlayerWireAction : MonoBehaviour
 
             float distanceToPoint = Vector3.Distance(playerGameObject.transform.position, grapplePoint[SIDE]);
 
-            joint[SIDE].maxDistance = distanceToPoint * 0.8f;
-            joint[SIDE].minDistance = distanceToPoint * 0.25f;
+            joint[SIDE].maxDistance = distanceToPoint * maxDistRate;
+            joint[SIDE].minDistance = distanceToPoint * minDistRate;
 
             joint[SIDE].spring = spring;
             joint[SIDE].damper = damper;
