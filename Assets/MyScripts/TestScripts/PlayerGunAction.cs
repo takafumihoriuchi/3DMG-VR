@@ -3,15 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ManeuveringGearAction : MonoBehaviour
+public class PlayerGunAction : MonoBehaviour
 {
     [SerializeField] private GameObject bullet = null;
 
     [SerializeField] private Transform leftHandAnchor = null;
     [SerializeField] private Transform rightHandAnchor = null;
 
-    [SerializeField] private AudioClip wireRelease = null;
-    [SerializeField] private AudioClip wireRewind = null;
     [SerializeField] private AudioClip gunShot = null;
 
     [SerializeField] private GameObject fireBulletGionCanvas = null;
@@ -31,11 +29,6 @@ public class ManeuveringGearAction : MonoBehaviour
 
     void Start()
     {
-        wireReleaseAudio = gameObject.AddComponent<AudioSource>();
-        wireReleaseAudio.clip = wireRelease;
-        wireRewindAudio = gameObject.AddComponent<AudioSource>();
-        wireRewindAudio.clip = wireRewind;
-
         bullet.SetActive(false);
         fireBulletGionCanvas.SetActive(false);
     }
@@ -43,14 +36,14 @@ public class ManeuveringGearAction : MonoBehaviour
     
     void Update()
     {
-        MonitorFireBullet(LEFT, leftHandAnchor,
+        MonitorGunAction(LEFT, leftHandAnchor,
             OVRInput.Get(OVRInput.RawButton.LIndexTrigger), Input.GetKey(KeyCode.Q));
-        MonitorFireBullet(RIGHT, rightHandAnchor,
+        MonitorGunAction(RIGHT, rightHandAnchor,
             OVRInput.Get(OVRInput.RawButton.RIndexTrigger), Input.GetKey(KeyCode.E));
     }
 
 
-    private void MonitorFireBullet(int SIDE, Transform handAnchor, bool isTriggered, bool isKeyPressed)
+    private void MonitorGunAction(int SIDE, Transform handAnchor, bool isTriggered, bool isKeyPressed)
     {
         if (bulletReady[SIDE] && (isTriggered || isKeyPressed))
         {
