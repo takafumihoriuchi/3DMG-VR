@@ -44,9 +44,9 @@ public class ManeuveringGearAction : MonoBehaviour
     void Update()
     {
         MonitorFireBullet(LEFT, leftHandAnchor,
-            OVRInput.Get(OVRInput.RawButton.LIndexTrigger), Input.GetKey(KeyCode.L));
+            OVRInput.Get(OVRInput.RawButton.LIndexTrigger), Input.GetKey(KeyCode.Q));
         MonitorFireBullet(RIGHT, rightHandAnchor,
-            OVRInput.Get(OVRInput.RawButton.RIndexTrigger), Input.GetKey(KeyCode.R));
+            OVRInput.Get(OVRInput.RawButton.RIndexTrigger), Input.GetKey(KeyCode.E));
     }
 
 
