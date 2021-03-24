@@ -53,8 +53,8 @@ public class PlayerWireAction : MonoBehaviour
 
     void LateUpdate()
     {
-        SetWire(LEFT);
-        SetWire(RIGHT);
+        RenderWire(LEFT);
+        RenderWire(RIGHT);
     }
 
 
@@ -81,12 +81,20 @@ public class PlayerWireAction : MonoBehaviour
         if (Physics.Raycast(handAnchor[SIDE].position,
             handAnchor[SIDE].forward, out hit, wireMaxLength, grappleableLayer)) // todo "grappable"ではなく、除外するレイヤーでは？
         {
+            wireInstance[SIDE].SetActive(true);
+
+            // todo 無限遠にアタッチされて吹き飛ばされてる？
+            Debug.Log("handAnchor[SIDE].position: " + handAnchor[SIDE].position);
+            Debug.Log("handAnchor[SIDE].forward: " + handAnchor[SIDE].forward);
             Debug.Log("hit.point: " + hit.point);
+            // => hit.point は正しく検知されている
+            // todo それでも無限遠（z軸の反対方向に）に飛ばされてしまう理由は何？
             grapplePoint[SIDE] = hit.point;
 
             joint[SIDE] = playerGameObject.AddComponent<SpringJoint>();
             joint[SIDE].autoConfigureConnectedAnchor = false;
             joint[SIDE].connectedAnchor = grapplePoint[SIDE];
+            //joint[SIDE].connectedAnchor = new Vector3(0.0f, 1.0f, 4.0f);
 
             float distanceToPoint = Vector3.Distance(playerGameObject.transform.position, grapplePoint[SIDE]);
 
@@ -110,10 +118,11 @@ public class PlayerWireAction : MonoBehaviour
     {
         lineRend[SIDE].positionCount = 0;
         Destroy(joint[SIDE]);
+        wireInstance[SIDE].SetActive(false);
     }
 
 
-    private void SetWire(int SIDE)
+    private void RenderWire(int SIDE)
     {
         if (!joint[SIDE]) return;
         lineRend[SIDE].SetPosition(0, handAnchor[SIDE].position);
@@ -124,7 +133,6 @@ public class PlayerWireAction : MonoBehaviour
     private void WireSetUp(int SIDE)
     {
         wireInstance[SIDE] = Instantiate(wire, handAnchor[SIDE]);
-        wireInstance[SIDE].SetActive(true);
 
         wireReleaseAudio[SIDE] = wireInstance[SIDE].AddComponent<AudioSource>();
         wireReleaseAudio[SIDE].clip = wireRelease;
